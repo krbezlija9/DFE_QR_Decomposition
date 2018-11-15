@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maxCompilerManager version="2">
+<enginePart internalEngineSubproject="DFE_QR_Decomposition_EngineCode" isSrcBin="false" isUseDefaultSelected="false" outputLocation="/DFE_QR_Decomposition_EngineCode/bin" projectName="DFE_QR_Decomposition"/>
+<cpuPart internalCpuSubproject="DFE_QR_Decomposition_CPUCode"/>
+<watchedFiles/>
+</maxCompilerManager>

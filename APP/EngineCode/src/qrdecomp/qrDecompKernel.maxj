@@ -1,0 +1,57 @@
+package qrdecomp;
+
+import com.maxeler.maxcompiler.v2.kernelcompiler.Kernel;
+import com.maxeler.maxcompiler.v2.kernelcompiler.KernelParameters;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEType;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.base.DFEVar;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVector;
+import com.maxeler.maxcompiler.v2.kernelcompiler.types.composite.DFEVectorType;
+import com.maxeler.maxcompiler.v2.kernelcompiler.stdlib.KernelMath;
+
+class qrDecompKernel extends Kernel {
+
+	private static final DFEType type = dfeInt(32);
+
+	protected qrDecompKernel(KernelParameters parameters, int matrixSize) {
+	super(parameters);
+
+	DFEVectorType<DFEVar> vectorType =
+		new DFEVectorType<DFEVar>(dfeFloat(8,24), matrixSize);
+
+	// Input
+	DFEVector<DFEVar> A = io.input("inMatrices", vectorType);
+	DFEVector<DFEVar> Q = vectorType.newInstance(this);
+	DFEVector<DFEVar> R = vectorType.newInstance(this);
+
+	DFEVar a[] = new DFEVar[matrixSize];
+	DFEVar q[] = new DFEVar[matrixSize];
+	DFEVar r[] = new DFEVar[matrixSize];
+
+	for(int i = 0; i < matrixSize; i++){
+			a[i] = A[i];
+			q[i] = r[i] = constant.var(dfeFloat(8,24),0.0);
+	}
+
+	int n = (int)Math.sqrt(matrixSize);
+	for (int k = 0; k < n; k++) {
+			DFEVar s = constant.var(dfeFloat(8,24),0.0);
+			for(int j = 0; j < n; j++){s = s + a[j*n+k]*a[j*n+k];}
+			r[k*n+k] = KernelMath.sqrt(s);
+			for(int j = 0; j < n; j++){q[j*n+k] = a[j*n+k]/r[k*n+k];}
+			for(int i = k+1; i < n; i++){
+					s = constant.var(dfeFloat(8,24),0.0);
+					for(int j = 0; j < n; j++){s = s + a[j*n+i]*q[j*n+k];}
+					r[k*n+i] = s;
+					for(int j = 0; j < n; j++){a[j*n+i] = a[j*n+i] - r[k*n+i]*q[j*n+k];}
+			}
+	}
+
+	for(int i = 0; i < matrixSize; i++){
+			Q[i]<==q[i];
+			R[i]<==r[i];
+	}
+
+		// Output
+	io.output("Q", Q, vectorType);
+	io.output("R", R, vectorType);
+}
