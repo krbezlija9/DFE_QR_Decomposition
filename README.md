@@ -32,4 +32,4 @@ How to find Q and R?
 
 * To find Q and R for a matrix A, we used the Modified Gram-Schmidt algorithm
 * Since the Q matrix we got need not be orthonormal, we need to orthonormalize it
-* That part we skipped, since we only wnated to calculate Q and R using maxeler
+* That part we skipped, since we only wanted to calculate Q and R using maxeler
